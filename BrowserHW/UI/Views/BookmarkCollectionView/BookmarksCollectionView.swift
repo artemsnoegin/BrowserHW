@@ -12,6 +12,8 @@ class BookmarksCollectionView: UIView {
     private let bookmarks: [Bookmark]
     private let collectionView: UICollectionView
     
+    weak var webSearchDelegate: WebSearchDelegate?
+    
     init(bookmarks: [Bookmark]) {
         self.bookmarks = bookmarks
         
@@ -94,7 +96,10 @@ extension BookmarksCollectionView: UICollectionViewDelegate, UICollectionViewDat
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // TODO: Можно передавать наружу замыканием (например, для открытия WebViewController)
+        let urlString = bookmarks[indexPath.item].urlString
+        if !urlString.isEmpty {
+            webSearchDelegate?.search(urlString: urlString)
+        }
     }
 }
 

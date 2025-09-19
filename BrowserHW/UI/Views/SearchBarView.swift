@@ -10,7 +10,9 @@ import UIKit
 class SearchBarView: UIView, UITextFieldDelegate {
     
     private let searchField = UITextField()
-    var search: ((String) -> ())?
+    private let searchButton = UIButton(type: .system)
+    
+    weak var webSearchDelegate: WebSearchDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,13 +30,15 @@ class SearchBarView: UIView, UITextFieldDelegate {
         searchField.placeholder = "URL"
         searchField.keyboardType = .URL
         searchField.returnKeyType = .search
+        searchField.autocapitalizationType = .none
         searchField.delegate = self
         
-        let searchButton = UIButton(type: .system)
         searchButton.setContentHuggingPriority(.required, for: .horizontal)
         searchButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         searchButton.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
         searchButton.addTarget(self, action: #selector(searchURl), for: .touchUpInside)
+        
+        searchButton.isEnabled = false
         
         let hStack = UIStackView(arrangedSubviews: [searchField, searchButton])
         hStack.axis = .horizontal
@@ -56,8 +60,8 @@ class SearchBarView: UIView, UITextFieldDelegate {
     }
     
     @objc private func searchURl() {
-        guard let urlString = searchField.text else { return }
-        search?(urlString)
+        guard let urlString = searchField.text, !urlString.isEmpty else { return }
+        webSearchDelegate?.search(urlString: urlString)
     }
     
     override func didMoveToSuperview() {
@@ -70,6 +74,7 @@ class SearchBarView: UIView, UITextFieldDelegate {
         guard let superview = superview else { return }
         let gesture = UITapGestureRecognizer()
         gesture.addTarget(self, action: #selector(hideKeyboard))
+        gesture.cancelsTouchesInView = false
         
         superview.addGestureRecognizer(gesture)
     }
@@ -82,9 +87,18 @@ class SearchBarView: UIView, UITextFieldDelegate {
         guard let urlString = textField.text, !urlString.isEmpty else { return false }
         
         textField.resignFirstResponder()
-        search?(urlString)
+        webSearchDelegate?.search(urlString: urlString)
         
         return true
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        guard let text = textField.text else { return }
+        if text.isEmpty {
+            searchButton.isEnabled = false
+        } else {
+            searchButton.isEnabled = true
+        }
     }
     
 }

@@ -11,5 +11,5 @@ struct Bookmark {
     
     let icon: UIImage?
     let title: String
-    
+    let urlString: String
 }

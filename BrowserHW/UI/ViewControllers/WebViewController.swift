@@ -48,7 +48,16 @@ class WebViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        if let url = URL(string: urlString) {
+        loadRequest()
+    }
+    
+    private func loadRequest() {
+        if urlString.hasPrefix("https://") {
+            guard let url = URL(string: urlString) else { return }
+            let request = URLRequest(url: url)
+            webView.load(request)
+        } else {
+            guard let url = URL(string: "https://" + urlString) else { return }
             let request = URLRequest(url: url)
             webView.load(request)
         }

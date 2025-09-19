@@ -7,8 +7,8 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
-    
+class HomeViewController: UIViewController, WebSearchDelegate {
+
     let searchBar = SearchBarView()
 
     override func viewDidLoad() {
@@ -21,11 +21,7 @@ class HomeViewController: UIViewController {
     }
 
     private func configureSearchBar() {
-        searchBar.search = { urlString in
-            if !urlString.isEmpty {
-                self.navigationController?.pushViewController(WebViewController(urlString: urlString), animated: true)
-            }
-        }
+        searchBar.webSearchDelegate = self
         
         view.addSubview(searchBar)
         searchBar.translatesAutoresizingMaskIntoConstraints = false
@@ -38,13 +34,19 @@ class HomeViewController: UIViewController {
     }
     
     private func configureCollection() {
-        let bookmarks = [Bookmark(icon: UIImage(systemName: "book"), title: "Apple has not been implemented"),
-                         Bookmark(icon: UIImage(systemName: "book"), title: "Google"),
-                         Bookmark(icon: UIImage(systemName: "book"), title: "TMS"),
-                         Bookmark(icon: UIImage(systemName: "book"), title: "OpenAI"),
-                         Bookmark(icon: UIImage(systemName: "book"), title: "Yandex")]
+        let bookmarks = [Bookmark(icon: UIImage(systemName: "book"), title: "Apple",
+                                  urlString: "https://apple.com"),
+                         Bookmark(icon: UIImage(systemName: "book"), title: "Google",
+                                 urlString: "https://google.com"),
+                         Bookmark(icon: UIImage(systemName: "book"), title: "Test errors and large titles",
+                                 urlString: "error test"),
+                         Bookmark(icon: UIImage(systemName: "book"), title: "OpenAI",
+                                 urlString: "https://openai.com"),
+                         Bookmark(icon: UIImage(systemName: "book"), title: "Yandex",
+                                 urlString: "https://yandex.ru")]
         
         let bookmarksCollectionView = BookmarksCollectionView(bookmarks: bookmarks)
+        bookmarksCollectionView.webSearchDelegate = self
         
         view.addSubview(bookmarksCollectionView)
         bookmarksCollectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -55,6 +57,10 @@ class HomeViewController: UIViewController {
             bookmarksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             bookmarksCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
+    }
+    
+    func search(urlString: String) {
+        navigationController?.pushViewController(WebViewController(urlString: urlString), animated: true)
     }
 
 }
