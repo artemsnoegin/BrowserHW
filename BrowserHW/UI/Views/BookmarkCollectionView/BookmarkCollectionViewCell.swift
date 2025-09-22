@@ -36,8 +36,11 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
     
     private func setupUI() {
         let iconBackgroundView = UIView()
-        iconBackgroundView.backgroundColor = .tertiarySystemBackground
+        iconBackgroundView.backgroundColor = .secondarySystemGroupedBackground
         iconBackgroundView.layer.cornerRadius = 12
+        iconBackgroundView.layer.shadowOpacity = 0.1
+        iconBackgroundView.layer.shadowRadius = 2.5
+        iconBackgroundView.layer.shadowOffset = .zero
         contentView.addSubview(iconBackgroundView)
         iconBackgroundView.translatesAutoresizingMaskIntoConstraints = false
         

@@ -19,6 +19,7 @@ class BookmarksCollectionView: UIView {
         
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
+        layout.sectionHeadersPinToVisibleBounds = true
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(frame: .zero)
@@ -30,14 +31,9 @@ class BookmarksCollectionView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override var intrinsicContentSize: CGSize {
-            return collectionView.collectionViewLayout.collectionViewContentSize
-        }
-    
     private func setupCollectionView() {
-        collectionView.isScrollEnabled = false
+        collectionView.isScrollEnabled = true
         collectionView.backgroundColor = .systemGroupedBackground
-        
         collectionView.register(
             BookmarksHeaderView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
@@ -50,6 +46,10 @@ class BookmarksCollectionView: UIView {
         
         collectionView.delegate = self
         collectionView.dataSource = self
+
+        collectionView.layer.cornerRadius = 24
+        collectionView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        collectionView.clipsToBounds = true
         
         addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -62,10 +62,23 @@ class BookmarksCollectionView: UIView {
         ])
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        invalidateIntrinsicContentSize()
-    }
+    private func updateHeight(maxHeight: CGFloat) {
+            let contentHeight = collectionView.collectionViewLayout.collectionViewContentSize.height
+            if contentHeight < maxHeight {
+                collectionView.isScrollEnabled = false
+                collectionView.heightAnchor.constraint(equalToConstant: contentHeight).isActive = true
+            } else {
+                collectionView.isScrollEnabled = true
+                collectionView.heightAnchor.constraint(equalToConstant: maxHeight).isActive = true
+            }
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            guard let superview = superview else { return updateHeight(maxHeight: 400) }
+
+            updateHeight(maxHeight: superview.frame.height / 2)
+        }
     
 }
 
@@ -119,7 +132,7 @@ extension BookmarksCollectionView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 32)
+        return CGSize(width: collectionView.bounds.width, height: 56)
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -136,7 +149,7 @@ extension BookmarksCollectionView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 12, left: 20, bottom: 16, right: 20)
+        return UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
     }
     
 }

@@ -27,7 +27,7 @@ class SearchBarView: UIView, UITextFieldDelegate {
     private func setupUI() {
         backgroundColor = .clear
         
-        let blurEffect = UIBlurEffect(style: .systemThinMaterial)
+        let blurEffect = UIBlurEffect(style: .systemUltraThinMaterial)
             let blurView = UIVisualEffectView(effect: blurEffect)
             blurView.translatesAutoresizingMaskIntoConstraints = false
             addSubview(blurView)
@@ -56,10 +56,13 @@ class SearchBarView: UIView, UITextFieldDelegate {
         let hStack = UIStackView(arrangedSubviews: [searchField, barButton])
         hStack.axis = .horizontal
         hStack.spacing = 8
-        hStack.backgroundColor = .tertiarySystemBackground.withAlphaComponent(0.6)
+        hStack.backgroundColor = .tertiarySystemBackground.withAlphaComponent(0.7)
         hStack.isLayoutMarginsRelativeArrangement = true
         hStack.layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         hStack.layer.cornerRadius = 12
+        hStack.layer.shadowOffset = .zero
+        hStack.layer.shadowOpacity = 0.1
+        hStack.layer.shadowRadius = 2.5
         
         addSubview(hStack)
         hStack.translatesAutoresizingMaskIntoConstraints = false

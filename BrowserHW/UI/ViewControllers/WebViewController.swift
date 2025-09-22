@@ -15,7 +15,7 @@ class WebViewController: UIViewController, MessageReceiver {
     
     private var backButton = UIBarButtonItem()
     private var forwardButton = UIBarButtonItem()
-    private var showBookmarksButton = UIBarButtonItem()
+    private var webPageActionButton = UIBarButtonItem()
     private var addBookmarkButton = UIBarButtonItem()
     
     private var urlString: String
@@ -32,7 +32,7 @@ class WebViewController: UIViewController, MessageReceiver {
     
     override func viewDidLoad() {
             super.viewDidLoad()
-            view.backgroundColor = .systemBackground
+            view.backgroundColor = .tertiarySystemBackground
             
             setupWebView()
             setupSearchBar()
@@ -70,22 +70,19 @@ class WebViewController: UIViewController, MessageReceiver {
     
     private func setupToolBar() {
         backButton = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(goBack))
-        backButton.isEnabled = false
         
         forwardButton = UIBarButtonItem(image: UIImage(systemName: "chevron.forward"), style: .plain, target: self, action: #selector(goForward))
-        forwardButton.isEnabled = false
+        forwardButton.isEnabled = webView.canGoForward
         
-        showBookmarksButton = UIBarButtonItem(image: UIImage(systemName: "book"), style: .plain, target: self, action: #selector(showBookmarks))
-        showBookmarksButton.isEnabled = false
+        addBookmarkButton = UIBarButtonItem(image: UIImage(systemName: "bookmark"), style: .plain, target: self, action: #selector(addBookmark))
         
-        addBookmarkButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(addBookmark))
-        addBookmarkButton.isEnabled = false
+        webPageActionButton = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(webPageAction))
         
         toolbarItems = [
             backButton, UIBarButtonItem.flexibleSpace(),
             forwardButton, UIBarButtonItem.flexibleSpace(),
-            showBookmarksButton, UIBarButtonItem.flexibleSpace(),
-            addBookmarkButton
+            addBookmarkButton, UIBarButtonItem.flexibleSpace(),
+            webPageActionButton
         ]
         
         navigationController?.isToolbarHidden = false
@@ -93,6 +90,7 @@ class WebViewController: UIViewController, MessageReceiver {
         if let toolbar = navigationController?.toolbar {
             let appearance = UIToolbarAppearance()
             appearance.configureWithDefaultBackground()
+            appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
             toolbar.standardAppearance = appearance
         }
     }
@@ -119,8 +117,12 @@ class WebViewController: UIViewController, MessageReceiver {
         }
     }
     
-    @objc private func showBookmarks() {
-        navigationController?.popToRootViewController(animated: true)
+    @objc private func webPageAction() {
+        if webView.isLoading {
+            webView.stopLoading()
+        } else {
+            webView.reload()
+        }
     }
     
     @objc private func addBookmark() {
@@ -147,25 +149,18 @@ class WebViewController: UIViewController, MessageReceiver {
 extension WebViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        print("Началась загрузка: \(String(describing: webView.url?.absoluteString))")
-        
+
+        webPageActionButton.image = UIImage(systemName: "xmark")
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         
-        showBookmarksButton.isEnabled = true
-        addBookmarkButton.isEnabled = true
-        backButton.isEnabled = true
-        forwardButton.isEnabled = webView.canGoForward
-        
-        if let url = webView.url {
-            urlString = url.absoluteString
-        }
+        webPageActionButton.image = UIImage(systemName: "arrow.clockwise")
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
         
-        print("Ошибка: \(error.localizedDescription)")
+        webPageActionButton.image = UIImage(systemName: "arrow.clockwise")
     }
     
 }

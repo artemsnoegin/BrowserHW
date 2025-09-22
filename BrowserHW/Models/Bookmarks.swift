@@ -18,7 +18,11 @@ class Bookmarks {
                              Bookmark(icon: UIImage(systemName: "book"), title: "OpenAI",
                                       urlString: "https://openai.com"),
                              Bookmark(icon: UIImage(systemName: "book"), title: "Yandex",
-                                      urlString: "https://yandex.ru")]
+                                      urlString: "https://yandex.ru"),
+                             Bookmark(icon: UIImage(systemName: "book"), title: "Apple",
+                                      urlString: "https://apple.com"),
+                             Bookmark(icon: UIImage(systemName: "book"), title: "Apple",
+                                      urlString: "https://apple.com"),]
     
     func loadBookmarks() -> [Bookmark] {
         

@@ -43,13 +43,12 @@ class HomeViewController: UIViewController, MessageReceiver {
         bookmarksCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            bookmarksCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 16),
-            bookmarksCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            bookmarksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            bookmarksCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            bookmarksCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bookmarksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            bookmarksCollectionView.heightAnchor.constraint(equalToConstant: view.frame.height / 2)
         ])
-        
-        bookmarksCollectionView.layer.cornerRadius = 12
-        
+
         bookmarksCollectionView.messageReceiver = self
     }
     
