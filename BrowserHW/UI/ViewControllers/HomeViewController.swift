@@ -7,60 +7,54 @@
 
 import UIKit
 
-class HomeViewController: UIViewController, WebSearchDelegate {
+class HomeViewController: UIViewController, MessageReceiver {
 
-    let searchBar = SearchBarView()
-
+    private let searchBar = SearchBarView()
+    private var bookmarks = Bookmarks()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemGroupedBackground
+        view.backgroundColor = .systemBackground
         
-        configureSearchBar()
-        configureCollection()
+        setupSearchBar()
+        setupCollection()
     }
 
-    private func configureSearchBar() {
-        searchBar.webSearchDelegate = self
+    private func setupSearchBar() {
+        navigationController?.navigationBar.isHidden = true
         
         view.addSubview(searchBar)
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            searchBar.topAnchor.constraint(equalTo: view.topAnchor),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
+        
+        searchBar.messageReceiver = self
     }
     
-    private func configureCollection() {
-        let bookmarks = [Bookmark(icon: UIImage(systemName: "book"), title: "Apple",
-                                  urlString: "https://apple.com"),
-                         Bookmark(icon: UIImage(systemName: "book"), title: "Google",
-                                 urlString: "https://google.com"),
-                         Bookmark(icon: UIImage(systemName: "book"), title: "Test errors and large titles",
-                                 urlString: "error test"),
-                         Bookmark(icon: UIImage(systemName: "book"), title: "OpenAI",
-                                 urlString: "https://openai.com"),
-                         Bookmark(icon: UIImage(systemName: "book"), title: "Yandex",
-                                 urlString: "https://yandex.ru")]
-        
-        let bookmarksCollectionView = BookmarksCollectionView(bookmarks: bookmarks)
-        bookmarksCollectionView.webSearchDelegate = self
+    private func setupCollection() {
+        let bookmarksCollectionView = BookmarksCollectionView(bookmarks: bookmarks.loadBookmarks())
         
         view.addSubview(bookmarksCollectionView)
         bookmarksCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            bookmarksCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 12),
-            bookmarksCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            bookmarksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            bookmarksCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            bookmarksCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 16),
+            bookmarksCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            bookmarksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
         ])
+        
+        bookmarksCollectionView.layer.cornerRadius = 12
+        
+        bookmarksCollectionView.messageReceiver = self
     }
     
-    func search(urlString: String) {
-        navigationController?.pushViewController(WebViewController(urlString: urlString), animated: true)
+    func receiveMessage(message: String) {
+        navigationController?.pushViewController(WebViewController(urlString: message, bookmarks: bookmarks.loadBookmarks()), animated: true)
     }
 
 }

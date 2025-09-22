@@ -7,6 +7,6 @@
 
 import UIKit
 
-protocol WebSearchDelegate: AnyObject {
-    func search(urlString: String)
+protocol MessageReceiver: AnyObject {
+    func receiveMessage(message: String)
 }

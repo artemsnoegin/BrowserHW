@@ -12,7 +12,7 @@ class BookmarksCollectionView: UIView {
     private let bookmarks: [Bookmark]
     private let collectionView: UICollectionView
     
-    weak var webSearchDelegate: WebSearchDelegate?
+    weak var messageReceiver: MessageReceiver?
     
     init(bookmarks: [Bookmark]) {
         self.bookmarks = bookmarks
@@ -30,7 +30,12 @@ class BookmarksCollectionView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var intrinsicContentSize: CGSize {
+            return collectionView.collectionViewLayout.collectionViewContentSize
+        }
+    
     private func setupCollectionView() {
+        collectionView.isScrollEnabled = false
         collectionView.backgroundColor = .systemGroupedBackground
         
         collectionView.register(
@@ -55,6 +60,11 @@ class BookmarksCollectionView: UIView {
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        invalidateIntrinsicContentSize()
     }
     
 }
@@ -97,8 +107,9 @@ extension BookmarksCollectionView: UICollectionViewDelegate, UICollectionViewDat
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let urlString = bookmarks[indexPath.item].urlString
+        
         if !urlString.isEmpty {
-            webSearchDelegate?.search(urlString: urlString)
+            messageReceiver?.receiveMessage(message: urlString)
         }
     }
 }

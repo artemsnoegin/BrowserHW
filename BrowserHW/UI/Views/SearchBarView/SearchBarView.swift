@@ -10,9 +10,9 @@ import UIKit
 class SearchBarView: UIView, UITextFieldDelegate {
     
     private let searchField = UITextField()
-    private let searchButton = UIButton(type: .system)
+    private let barButton = UIButton(type: .system)
     
-    weak var webSearchDelegate: WebSearchDelegate?
+    weak var messageReceiver: MessageReceiver?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -25,7 +25,20 @@ class SearchBarView: UIView, UITextFieldDelegate {
     }
     
     private func setupUI() {
-        backgroundColor = .systemGroupedBackground
+        backgroundColor = .clear
+        
+        let blurEffect = UIBlurEffect(style: .systemThinMaterial)
+            let blurView = UIVisualEffectView(effect: blurEffect)
+            blurView.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(blurView)
+            sendSubviewToBack(blurView)
+            
+            NSLayoutConstraint.activate([
+                blurView.topAnchor.constraint(equalTo: topAnchor),
+                blurView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                blurView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                blurView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
         
         searchField.placeholder = "URL"
         searchField.keyboardType = .URL
@@ -33,17 +46,17 @@ class SearchBarView: UIView, UITextFieldDelegate {
         searchField.autocapitalizationType = .none
         searchField.delegate = self
         
-        searchButton.setContentHuggingPriority(.required, for: .horizontal)
-        searchButton.setContentCompressionResistancePriority(.required, for: .horizontal)
-        searchButton.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
-        searchButton.addTarget(self, action: #selector(searchURl), for: .touchUpInside)
+        barButton.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
+        barButton.setContentHuggingPriority(.required, for: .horizontal)
+        barButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        barButton.addTarget(self, action: #selector(didTapBarButton), for: .touchUpInside)
         
-        searchButton.isEnabled = false
+        barButton.isEnabled = false
         
-        let hStack = UIStackView(arrangedSubviews: [searchField, searchButton])
+        let hStack = UIStackView(arrangedSubviews: [searchField, barButton])
         hStack.axis = .horizontal
         hStack.spacing = 8
-        hStack.backgroundColor = .tertiarySystemBackground
+        hStack.backgroundColor = .tertiarySystemBackground.withAlphaComponent(0.6)
         hStack.isLayoutMarginsRelativeArrangement = true
         hStack.layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         hStack.layer.cornerRadius = 12
@@ -59,17 +72,6 @@ class SearchBarView: UIView, UITextFieldDelegate {
         ])
     }
     
-    @objc private func searchURl() {
-        guard let urlString = searchField.text, !urlString.isEmpty else { return }
-        webSearchDelegate?.search(urlString: urlString)
-    }
-    
-    override func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        
-        hideKeyboardOnTap()
-    }
-    
     private func hideKeyboardOnTap() {
         guard let superview = superview else { return }
         let gesture = UITapGestureRecognizer()
@@ -83,21 +85,37 @@ class SearchBarView: UIView, UITextFieldDelegate {
         searchField.endEditing(true)
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        guard let urlString = textField.text, !urlString.isEmpty else { return false }
+    
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
         
+        hideKeyboardOnTap()
+    }
+    
+    private func sendUrlString() {
+        guard let urlString = searchField.text, !urlString.isEmpty else { return }
+        messageReceiver?.receiveMessage(message: urlString)
+    }
+    
+    @objc private func didTapBarButton() {
+        sendUrlString()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        webSearchDelegate?.search(urlString: urlString)
+        
+        sendUrlString()
         
         return true
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
         guard let text = textField.text else { return }
+        
         if text.isEmpty {
-            searchButton.isEnabled = false
+            barButton.isEnabled = false
         } else {
-            searchButton.isEnabled = true
+            barButton.isEnabled = true
         }
     }
     
