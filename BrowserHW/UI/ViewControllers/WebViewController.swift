@@ -189,6 +189,20 @@ class WebViewController: UIViewController, NetworkManager {
         }
     }
     
+    private func clearInfo() {
+        let dataStorage = WKWebsiteDataStore.default()
+        
+        dataStorage.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            dataStorage.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records) {
+                print("Данные очищены")
+            }
+        }
+    }
+    
+    deinit {
+        clearInfo()
+    }
+    
 }
 
 extension WebViewController: WKNavigationDelegate {
