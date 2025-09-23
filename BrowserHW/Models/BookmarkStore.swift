@@ -13,8 +13,6 @@ class BookmarkStore {
                                       pageURL: URL(string: "https://apple.com")),
                              Bookmark(icon: UIImage(systemName: "book"), title: "Google",
                                       pageURL: URL(string: "https://google.com")),
-                             Bookmark(icon: UIImage(systemName: "book"), title: "Test errors and large titles",
-                                      pageURL: URL(string: "error test")),
                              Bookmark(icon: UIImage(systemName: "book"), title: "OpenAI",
                                       pageURL: URL(string: "https://openai.com")),
                              Bookmark(icon: UIImage(systemName: "book"), title: "Yandex",

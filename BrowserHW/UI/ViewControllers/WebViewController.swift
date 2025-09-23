@@ -25,7 +25,7 @@ class WebViewController: UIViewController, NetworkManager {
     
     override func viewDidLoad() {
             super.viewDidLoad()
-            view.backgroundColor = .tertiarySystemBackground
+            view.backgroundColor = .systemGroupedBackground
             
             setupWebView()
             setupSearchBar()

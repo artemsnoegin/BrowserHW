@@ -11,7 +11,7 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
     
     static let reuseIdentifier = "BookmarkCollectionViewCell"
     
-    private let iconView = UIImageView()
+    private let iconLabel = UILabel()
     private let titleLabel = UILabel()
     
     override var isHighlighted: Bool {
@@ -30,7 +30,8 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(bookmark: Bookmark) {
-        iconView.image = bookmark.icon
+        let firstLetter = bookmark.title.first
+        iconLabel.text = firstLetter?.description
         titleLabel.text = bookmark.title
     }
     
@@ -44,9 +45,11 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(iconBackgroundView)
         iconBackgroundView.translatesAutoresizingMaskIntoConstraints = false
         
-        iconView.contentMode = .scaleAspectFit
-        iconBackgroundView.addSubview(iconView)
-        iconView.translatesAutoresizingMaskIntoConstraints = false
+        iconLabel.textAlignment = .center
+        iconLabel.font = .boldSystemFont(ofSize: contentView.frame.height / 2)
+        iconLabel.textColor = .secondaryLabel
+        iconBackgroundView.addSubview(iconLabel)
+        iconLabel.translatesAutoresizingMaskIntoConstraints = false
         
         titleLabel.font = .boldSystemFont(ofSize: 13)
         titleLabel.textAlignment = .center
@@ -60,10 +63,10 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
             iconBackgroundView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             iconBackgroundView.heightAnchor.constraint(equalTo: iconBackgroundView.widthAnchor),
             
-            iconView.topAnchor.constraint(equalTo: iconBackgroundView.topAnchor, constant: 8),
-            iconView.leadingAnchor.constraint(equalTo: iconBackgroundView.leadingAnchor, constant: 8),
-            iconView.trailingAnchor.constraint(equalTo: iconBackgroundView.trailingAnchor, constant: -8),
-            iconView.bottomAnchor.constraint(equalTo: iconBackgroundView.bottomAnchor, constant: -8),
+            iconLabel.topAnchor.constraint(equalTo: iconBackgroundView.topAnchor, constant: 8),
+            iconLabel.leadingAnchor.constraint(equalTo: iconBackgroundView.leadingAnchor, constant: 8),
+            iconLabel.trailingAnchor.constraint(equalTo: iconBackgroundView.trailingAnchor, constant: -8),
+            iconLabel.bottomAnchor.constraint(equalTo: iconBackgroundView.bottomAnchor, constant: -8),
             
             titleLabel.topAnchor.constraint(equalTo: iconBackgroundView.bottomAnchor, constant: 4),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
