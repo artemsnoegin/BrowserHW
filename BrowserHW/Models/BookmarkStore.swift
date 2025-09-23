@@ -9,13 +9,13 @@ import UIKit
 
 class BookmarkStore {
     
-    private var bookmarks = [Bookmark(icon: UIImage(systemName: "book"), title: "Apple",
+    private var bookmarks = [Bookmark(pageTitle: "Apple",
                                       pageURL: URL(string: "https://apple.com")),
-                             Bookmark(icon: UIImage(systemName: "book"), title: "Google",
+                             Bookmark(pageTitle: "Google",
                                       pageURL: URL(string: "https://google.com")),
-                             Bookmark(icon: UIImage(systemName: "book"), title: "OpenAI",
+                             Bookmark(pageTitle: "OpenAI",
                                       pageURL: URL(string: "https://openai.com")),
-                             Bookmark(icon: UIImage(systemName: "book"), title: "Yandex",
+                             Bookmark(pageTitle: "Yandex",
                                       pageURL: URL(string:"https://yandex.ru")),]
     
     func loadBookmarks() -> [Bookmark] {

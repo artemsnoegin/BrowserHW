@@ -127,17 +127,17 @@ class WebViewController: UIViewController, NetworkManager {
     private func showBookmarkAlert() {
         let alert = UIAlertController(title: "Bookmarks", message: nil, preferredStyle: .actionSheet)
         
-        let addNewBookmarkAction = UIAlertAction(title: "Add new bookmark", style: .default) { _ in
-            
-            self.showNewBookmarkAlert()
-        }
-        alert.addAction(addNewBookmarkAction)
-        
         let showBookmarksAction = UIAlertAction(title: "Show bookmarks", style: .default) { _ in
             self.navigationController?.popToRootViewController(animated: true)
             self.bookmarkButton.image = UIImage(systemName: "bookmark")
         }
         alert.addAction(showBookmarksAction)
+        
+        let addNewBookmarkAction = UIAlertAction(title: "Add new bookmark", style: .default) { _ in
+            
+            self.showNewBookmarkAlert()
+        }
+        alert.addAction(addNewBookmarkAction)
         
         present(alert, animated: true)
     }
@@ -158,7 +158,7 @@ class WebViewController: UIViewController, NetworkManager {
         let confirmAction = UIAlertAction(title: "Confirm", style: .cancel) { _ in
             let title = alert.textFields?[0].text ?? "New Bookmark"
             let url = URL(string: alert.textFields?[1].text ?? "")
-            let newBookmark = Bookmark(icon: UIImage(), title: title, pageURL: url)
+            let newBookmark = Bookmark(pageTitle: title, pageURL: url)
             self.bookmarksUpdater?.addBookmark(newBookmark)
             
             self.bookmarkButton.image = UIImage(systemName: "bookmark")

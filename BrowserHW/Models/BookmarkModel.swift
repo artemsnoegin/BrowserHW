@@ -9,7 +9,6 @@ import UIKit
 
 struct Bookmark {
     
-    let icon: UIImage?
-    let title: String
+    let pageTitle: String
     let pageURL: URL?
 }

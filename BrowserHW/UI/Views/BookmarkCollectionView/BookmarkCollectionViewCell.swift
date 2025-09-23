@@ -30,9 +30,9 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(bookmark: Bookmark) {
-        let firstLetter = bookmark.title.first
+        let firstLetter = bookmark.pageTitle.first
         iconLabel.text = firstLetter?.description
-        titleLabel.text = bookmark.title
+        titleLabel.text = bookmark.pageTitle
     }
     
     private func setupUI() {
