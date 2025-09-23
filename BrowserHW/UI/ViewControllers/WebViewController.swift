@@ -8,7 +8,7 @@
 import UIKit
 import WebKit
 
-class WebViewController: UIViewController, MessageReceiver {
+class WebViewController: UIViewController, NetworkManager {
 
     private var webView = WKWebView()
     private let searchBar = SearchBarView()
@@ -16,19 +16,12 @@ class WebViewController: UIViewController, MessageReceiver {
     private var backButton = UIBarButtonItem()
     private var forwardButton = UIBarButtonItem()
     private var webPageActionButton = UIBarButtonItem()
-    private var addBookmarkButton = UIBarButtonItem()
+    private var bookmarkButton = UIBarButtonItem()
     
-    private var urlString: String
+    weak var bookmarksUpdater: BookmarkUpdater?
     
-    init(urlString: String, bookmarks: [Bookmark]) {
-        self.urlString = urlString
-        
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    private var pageURL: URL?
+    private var pageTitle: String?
     
     override func viewDidLoad() {
             super.viewDidLoad()
@@ -57,7 +50,7 @@ class WebViewController: UIViewController, MessageReceiver {
     }
     
     private func setupSearchBar() {
-        searchBar.messageReceiver = self
+        searchBar.networkManager = self
         view.addSubview(searchBar)
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         
@@ -74,14 +67,14 @@ class WebViewController: UIViewController, MessageReceiver {
         forwardButton = UIBarButtonItem(image: UIImage(systemName: "chevron.forward"), style: .plain, target: self, action: #selector(goForward))
         forwardButton.isEnabled = webView.canGoForward
         
-        addBookmarkButton = UIBarButtonItem(image: UIImage(systemName: "bookmark"), style: .plain, target: self, action: #selector(addBookmark))
+        bookmarkButton = UIBarButtonItem(image: UIImage(systemName: "bookmark"), style: .plain, target: self, action: #selector(didTapOnBookmark))
         
         webPageActionButton = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(webPageAction))
         
         toolbarItems = [
             backButton, UIBarButtonItem.flexibleSpace(),
             forwardButton, UIBarButtonItem.flexibleSpace(),
-            addBookmarkButton, UIBarButtonItem.flexibleSpace(),
+            bookmarkButton, UIBarButtonItem.flexibleSpace(),
             webPageActionButton
         ]
         
@@ -125,37 +118,93 @@ class WebViewController: UIViewController, MessageReceiver {
         }
     }
     
-    @objc private func addBookmark() {
-//        bookmarks.append(Bookmark(icon: UIImage(systemName: "book"), title: "new", urlString: urlString))
+    @objc private func didTapOnBookmark() {
+        bookmarkButton.image = UIImage(systemName: "bookmark.fill")
+        
+        showBookmarkAlert()
     }
     
-    func receiveMessage(message: String) {
-        self.urlString = message
+    private func showBookmarkAlert() {
+        let alert = UIAlertController(title: "Bookmarks", message: nil, preferredStyle: .actionSheet)
+        
+        let addNewBookmarkAction = UIAlertAction(title: "Add new bookmark", style: .default) { _ in
+            
+            self.showNewBookmarkAlert()
+        }
+        alert.addAction(addNewBookmarkAction)
+        
+        let showBookmarksAction = UIAlertAction(title: "Show bookmarks", style: .default) { _ in
+            self.navigationController?.popToRootViewController(animated: true)
+            self.bookmarkButton.image = UIImage(systemName: "bookmark")
+        }
+        alert.addAction(showBookmarksAction)
+        
+        present(alert, animated: true)
+    }
+    
+    private func showNewBookmarkAlert() {
+        let alert = UIAlertController(title: "New Bookmark", message: nil, preferredStyle: .alert)
+        
+        alert.addTextField { title in
+            title.placeholder = "Title"
+            title.text = self.pageTitle
+        }
+        
+        alert.addTextField { url in
+            url.placeholder = "URL"
+            url.text = self.pageURL?.absoluteString
+        }
+        
+        let confirmAction = UIAlertAction(title: "Confirm", style: .cancel) { _ in
+            let title = alert.textFields?[0].text ?? "New Bookmark"
+            let url = URL(string: alert.textFields?[1].text ?? "")
+            let newBookmark = Bookmark(icon: UIImage(), title: title, pageURL: url)
+            self.bookmarksUpdater?.addBookmark(newBookmark)
+            
+            self.bookmarkButton.image = UIImage(systemName: "bookmark")
+        }
+        alert.addAction(confirmAction)
+        
+        present(alert, animated: true)
+    }
+    
+    func receiveURL(url: URL?) {
+        self.pageURL = url
         loadRequest()
     }
     
     private func loadRequest() {
-        var urlStringToLoad = urlString
-        
-        if !urlStringToLoad.hasPrefix("https://") {
-            urlStringToLoad = "https://" + urlStringToLoad
-        }
-        
-        guard let url = URL(string: urlStringToLoad) else { return }
+        guard let url = pageURL else { return }
         webView.load(URLRequest(url: url))
     }
+    
+    private func getInfo() {
+        webView.evaluateJavaScript("document.title") { result, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let title = result as? String {
+                self.searchBar.updatePlaceholder(text: title)
+                self.pageTitle = title
+            }
+        }
+    }
+    
 }
 
 extension WebViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-
+        
+        searchBar.updatePlaceholder(text: pageURL?.absoluteString ?? "Loading...")
         webPageActionButton.image = UIImage(systemName: "xmark")
+        pageURL = webView.url
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         
         webPageActionButton.image = UIImage(systemName: "arrow.clockwise")
+        pageURL = webView.url
+        getInfo()
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {

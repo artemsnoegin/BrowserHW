@@ -9,14 +9,12 @@ import UIKit
 
 class BookmarksCollectionView: UIView {
     
-    private let bookmarks: [Bookmark]
+    private var bookmarks = [Bookmark]()
     private let collectionView: UICollectionView
     
-    weak var messageReceiver: MessageReceiver?
+    weak var networkManager: NetworkManager?
     
-    init(bookmarks: [Bookmark]) {
-        self.bookmarks = bookmarks
-        
+    init() {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.sectionHeadersPinToVisibleBounds = true
@@ -33,6 +31,8 @@ class BookmarksCollectionView: UIView {
     
     private func setupCollectionView() {
         collectionView.isScrollEnabled = true
+        collectionView.showsVerticalScrollIndicator = false
+        
         collectionView.backgroundColor = .systemGroupedBackground
         collectionView.register(
             BookmarksHeaderView.self,
@@ -61,24 +61,6 @@ class BookmarksCollectionView: UIView {
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
-    
-    private func updateHeight(maxHeight: CGFloat) {
-            let contentHeight = collectionView.collectionViewLayout.collectionViewContentSize.height
-            if contentHeight < maxHeight {
-                collectionView.isScrollEnabled = false
-                collectionView.heightAnchor.constraint(equalToConstant: contentHeight).isActive = true
-            } else {
-                collectionView.isScrollEnabled = true
-                collectionView.heightAnchor.constraint(equalToConstant: maxHeight).isActive = true
-            }
-        }
-        
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            guard let superview = superview else { return updateHeight(maxHeight: 400) }
-
-            updateHeight(maxHeight: superview.frame.height / 2)
-        }
     
 }
 
@@ -119,12 +101,16 @@ extension BookmarksCollectionView: UICollectionViewDelegate, UICollectionViewDat
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let urlString = bookmarks[indexPath.item].urlString
-        
-        if !urlString.isEmpty {
-            messageReceiver?.receiveMessage(message: urlString)
-        }
+        let url = bookmarks[indexPath.item].pageURL
+        networkManager?.receiveURL(url: url)
+
     }
+    
+    func updateBookmarks(_ bookmarks: [Bookmark]) {
+        self.bookmarks = bookmarks
+        collectionView.reloadData()
+    }
+    
 }
 
 extension BookmarksCollectionView: UICollectionViewDelegateFlowLayout {

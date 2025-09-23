@@ -7,10 +7,11 @@
 
 import UIKit
 
-class HomeViewController: UIViewController, MessageReceiver {
+class HomeViewController: UIViewController, NetworkManager, BookmarkUpdater {
 
     private let searchBar = SearchBarView()
-    private var bookmarks = Bookmarks()
+    private var bookmarks = BookmarkStore()
+    private let bookmarksCollectionView = BookmarksCollectionView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,11 +34,11 @@ class HomeViewController: UIViewController, MessageReceiver {
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
         
-        searchBar.messageReceiver = self
+        searchBar.networkManager = self
     }
     
     private func setupCollection() {
-        let bookmarksCollectionView = BookmarksCollectionView(bookmarks: bookmarks.loadBookmarks())
+        bookmarksCollectionView.updateBookmarks(self.bookmarks.loadBookmarks())
         
         view.addSubview(bookmarksCollectionView)
         bookmarksCollectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -46,14 +47,22 @@ class HomeViewController: UIViewController, MessageReceiver {
             bookmarksCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             bookmarksCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bookmarksCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            bookmarksCollectionView.heightAnchor.constraint(equalToConstant: view.frame.height / 2)
+            bookmarksCollectionView.bottomAnchor.constraint(equalTo: view.centerYAnchor)
         ])
 
-        bookmarksCollectionView.messageReceiver = self
+        bookmarksCollectionView.networkManager = self
     }
     
-    func receiveMessage(message: String) {
-        navigationController?.pushViewController(WebViewController(urlString: message, bookmarks: bookmarks.loadBookmarks()), animated: true)
+    func receiveURL(url: URL?) {
+        let webViewController = WebViewController()
+        webViewController.bookmarksUpdater = self
+        webViewController.receiveURL(url: url)
+        navigationController?.pushViewController(webViewController, animated: true)
+    }
+    
+    func addBookmark(_ bookmark: Bookmark) {
+        bookmarks.addBookmark(bookmark)
+        bookmarksCollectionView.updateBookmarks(self.bookmarks.loadBookmarks())
     }
 
 }

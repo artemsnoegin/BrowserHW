@@ -7,6 +7,6 @@
 
 import UIKit
 
-protocol MessageReceiver: AnyObject {
-    func receiveMessage(message: String)
+protocol NetworkManager: AnyObject {
+    func receiveURL(url: URL?)
 }

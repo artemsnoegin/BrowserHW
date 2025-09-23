@@ -12,7 +12,7 @@ class SearchBarView: UIView, UITextFieldDelegate {
     private let searchField = UITextField()
     private let barButton = UIButton(type: .system)
     
-    weak var messageReceiver: MessageReceiver?
+    weak var networkManager: NetworkManager?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -95,19 +95,19 @@ class SearchBarView: UIView, UITextFieldDelegate {
         hideKeyboardOnTap()
     }
     
-    private func sendUrlString() {
+    private func sendURL() {
         guard let urlString = searchField.text, !urlString.isEmpty else { return }
-        messageReceiver?.receiveMessage(message: urlString)
+        networkManager?.receiveURL(url: URL(string: urlString))
     }
     
     @objc private func didTapBarButton() {
-        sendUrlString()
+        sendURL()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         
-        sendUrlString()
+        sendURL()
         
         return true
     }
@@ -120,6 +120,10 @@ class SearchBarView: UIView, UITextFieldDelegate {
         } else {
             barButton.isEnabled = true
         }
+    }
+    
+    func updatePlaceholder(text: String) {
+        searchField.placeholder = text
     }
     
 }
