@@ -10,7 +10,8 @@ import UIKit
 class BookmarksCollectionView: UIView {
     
     private var bookmarks = [Bookmark]()
-    private let collectionView: UICollectionView
+    let collectionView: UICollectionView
+    var isEditingMode = false
     
     weak var networkManager: NetworkManager?
     
@@ -96,14 +97,39 @@ extension BookmarksCollectionView: UICollectionViewDelegate, UICollectionViewDat
             for: indexPath
         ) as! BookmarkCollectionViewCell
         
-        cell.configure(bookmark: bookmarks[indexPath.item])
+        cell.configure(bookmark: bookmarks[indexPath.item], isEditing: isEditingMode)
+        
+        cell.onDelete = { [weak self] in
+            self?.bookmarks.remove(at: indexPath.item)
+            collectionView.deleteItems(at: [indexPath])
+        }
+        
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let url = bookmarks[indexPath.item].pageURL
-        networkManager?.receiveURL(url: url)
+    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) {
+            UIView.animate(withDuration: 0.1) {
+                cell.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            }
+        }
+    }
 
+    func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) {
+            UIView.animate(withDuration: 0.4,
+                           delay: 0,
+                           usingSpringWithDamping: 0.4,
+                           initialSpringVelocity: 6,
+                           options: [.curveEaseInOut],
+                           animations: {
+                cell.transform = .identity
+            }) { [weak self] _ in
+                guard let self = self else { return }
+                let url = self.bookmarks[indexPath.item].pageURL
+                self.networkManager?.receiveURL(url: url)
+            }
+        }
     }
     
     func updateBookmarks(_ bookmarks: [Bookmark]) {
@@ -135,7 +161,7 @@ extension BookmarksCollectionView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
+        return UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
     }
     
 }

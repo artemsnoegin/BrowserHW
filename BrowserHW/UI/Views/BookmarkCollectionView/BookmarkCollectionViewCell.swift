@@ -14,9 +14,13 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
     private let iconLabel = UILabel()
     private let titleLabel = UILabel()
     
-    override var isHighlighted: Bool {
+    private let deleteButton = UIButton(type: .system)
+    
+    var onDelete: (() -> Void)?
+    
+    var isEditing: Bool = false {
         didSet {
-            contentView.alpha = isHighlighted ? 0.5 : 1.0
+            deleteButton.isHidden = !isEditing
         }
     }
     
@@ -29,10 +33,11 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(bookmark: Bookmark) {
+    func configure(bookmark: Bookmark, isEditing: Bool) {
         let firstLetter = bookmark.pageTitle.first
         iconLabel.text = firstLetter?.description
         titleLabel.text = bookmark.pageTitle
+        self.isEditing = isEditing
     }
     
     private func setupUI() {
@@ -57,6 +62,13 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
+        deleteButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
+        deleteButton.tintColor = .systemRed
+        
+        deleteButton.translatesAutoresizingMaskIntoConstraints = false
+        deleteButton.addTarget(self, action: #selector(deleteTapped), for: .touchUpInside)
+        contentView.addSubview(deleteButton)
+        
         NSLayoutConstraint.activate([
             iconBackgroundView.topAnchor.constraint(equalTo: contentView.topAnchor),
             iconBackgroundView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -71,6 +83,17 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
             titleLabel.topAnchor.constraint(equalTo: iconBackgroundView.bottomAnchor, constant: 4),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+            deleteButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -8),
+            deleteButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: -8),
+            deleteButton.widthAnchor.constraint(equalToConstant: 24),
+            deleteButton.heightAnchor.constraint(equalToConstant: 24),
         ])
+        
+        deleteButton.isHidden = true
     }
+    
+    @objc private func deleteTapped() {
+            onDelete?()
+        }
 }

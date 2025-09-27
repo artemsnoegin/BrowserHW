@@ -13,6 +13,8 @@ class HomeViewController: UIViewController, NetworkManager, BookmarkUpdater {
     private var bookmarks = BookmarkStore()
     private let bookmarksCollectionView = BookmarksCollectionView()
     
+    private let editButton = UIButton()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -20,6 +22,7 @@ class HomeViewController: UIViewController, NetworkManager, BookmarkUpdater {
         
         setupSearchBar()
         setupCollection()
+        setupEditButton()
     }
 
     private func setupSearchBar() {
@@ -37,6 +40,30 @@ class HomeViewController: UIViewController, NetworkManager, BookmarkUpdater {
         searchBar.networkManager = self
     }
     
+    private func setupEditButton() {
+        editButton.setTitle("Edit", for: .normal)
+        editButton.setTitleColor(.secondaryLabel, for: .normal)
+        editButton.backgroundColor = .systemBackground
+        
+        editButton.layer.cornerRadius = 20
+        
+        editButton.layer.shadowOpacity = 0.2
+        editButton.layer.shadowRadius = 2
+        editButton.layer.shadowOffset = .zero
+        
+        view.addSubview(editButton)
+        editButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            editButton.topAnchor.constraint(equalTo: bookmarksCollectionView.bottomAnchor, constant: 16),
+            editButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            editButton.widthAnchor.constraint(equalToConstant: 80),
+            editButton.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        
+        editButton.addTarget(self, action: #selector(editTapped), for: .touchUpInside)
+    }
+    
     private func setupCollection() {
         bookmarksCollectionView.updateBookmarks(self.bookmarks.loadBookmarks())
         
@@ -51,6 +78,25 @@ class HomeViewController: UIViewController, NetworkManager, BookmarkUpdater {
         ])
 
         bookmarksCollectionView.networkManager = self
+    }
+    
+    @objc private func editTapped(sender: UIButton) {
+        UIView.animate(withDuration: 0.1,
+                       animations: {
+            sender.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        }, completion: { [weak self] _ in
+            guard let self = self else { return }
+            UIView.animate(withDuration: 0.4,
+                           delay: 0,
+                           usingSpringWithDamping: 0.4,
+                           initialSpringVelocity: 6,
+                           options: [.curveEaseInOut],
+                           animations: {
+                sender.transform = .identity
+            })
+            self.bookmarksCollectionView.isEditingMode.toggle()
+            self.bookmarksCollectionView.collectionView.reloadData()
+        })
     }
     
     func receiveURL(url: URL?) {
