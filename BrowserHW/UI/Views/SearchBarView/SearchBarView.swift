@@ -68,7 +68,7 @@ class SearchBarView: UIView, UITextFieldDelegate {
         hStack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            hStack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            hStack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 8),
             hStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             hStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             hStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
