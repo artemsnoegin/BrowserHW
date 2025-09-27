@@ -34,7 +34,7 @@ class BookmarksCollectionView: UIView {
         collectionView.isScrollEnabled = true
         collectionView.showsVerticalScrollIndicator = false
         
-        collectionView.backgroundColor = .systemGroupedBackground
+        collectionView.backgroundColor = .tertiarySystemGroupedBackground
         collectionView.register(
             BookmarksHeaderView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,

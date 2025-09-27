@@ -22,7 +22,7 @@ class BookmarksHeaderView: UICollectionReusableView {
     }
     
     private func setupUI() {
-        backgroundColor = .systemGroupedBackground
+        backgroundColor = .tertiarySystemGroupedBackground
         
         titleLabel.font = .boldSystemFont(ofSize: 24)
         titleLabel.textColor = .label

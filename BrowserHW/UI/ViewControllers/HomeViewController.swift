@@ -43,7 +43,7 @@ class HomeViewController: UIViewController, NetworkManager, BookmarkUpdater {
     private func setupEditButton() {
         editButton.setTitle("Edit", for: .normal)
         editButton.setTitleColor(.secondaryLabel, for: .normal)
-        editButton.backgroundColor = .systemBackground
+        editButton.backgroundColor = .tertiarySystemBackground
         
         editButton.layer.cornerRadius = 20
         
