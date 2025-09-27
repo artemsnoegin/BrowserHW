@@ -13,10 +13,10 @@
 ### Светлая Тема
 <table>
   <tr>
-    <td style="border: none;"><img src="docs/BrowserHW_Light_Screenshot_1_-_iPhone_16_Pro.png" height="400" alt="Скриншот решения1"></td>
+    <td style="border: none;"><img src="docs/BrowserHW_Light_Screenshot_4_-_iPhone_16_Pro.png" height="400" alt="Скриншот решения1"></td>
     <td style="border: none;"><img src="docs/BrowserHW_Light_Screenshot_2_-_iPhone_16_Pro.png" height="400" alt="Скриншот решения2"></td>
     <td style="border: none;"><img src="docs/BrowserHW_Light_Screenshot_3_-_iPhone_16_Pro.png" height="400" alt="Скриншот решения3"></td>
-    <td style="border: none;"><img src="docs/BrowserHW_Light_Screenshot_4_-_iPhone_16_Pro.png" height="400" alt="Скриншот решения3"></td>
+    <td style="border: none;"><img src="docs/BrowserHW_Light_Screenshot_1_-_iPhone_16_Pro.png" height="400" alt="Скриншот решения3"></td>
   </tr>
 </table>
 
